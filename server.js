@@ -11,15 +11,18 @@ dotenv.config({ path: "./config/config.env" });
 connectDB();
 
 // Middlewares
-// const logger = require("./middleware/logger")
+// const logger = require("./middleware/logger");
 
 // Route files
 const bootcamps = require("./routes/bootcamps");
 
 const app = express();
 
+// Json Body parser
+app.use(express.json());
+
 // Dev logging middlewares
-// app.use(logger) //--> using custom logger
+// app.use(logger); //--> using custom logger
 if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
 }
