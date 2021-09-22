@@ -1,7 +1,9 @@
 const ErrorResponse = require("../utils/errorResponse");
 
 const errorHandler = (err, req, res, next) => {
-    console.log(err.stack.red);
+    if (process.env.NODE_ENV === "development") {
+        console.log(err.stack.red);
+    }
 
     let error = { ...err }; // if a custom error object, error.statusCode is present
     error.message = err.message;
