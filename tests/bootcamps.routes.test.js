@@ -32,6 +32,14 @@ describe("Sample test", () => {
         expect(res.body.success).toBe(false);
     });
 
+    it("should get 2 bootcamps within boston area", async () => {
+        const res = await request
+            .agent(server)
+            .get("/api/v1/bootcamps/radius/02118/30");
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.count).toEqual(2);
+    });
+
     afterAll(async () => {
         server.close();
         conn.disconnect();
