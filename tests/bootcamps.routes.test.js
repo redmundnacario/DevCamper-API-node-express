@@ -40,6 +40,33 @@ describe("Sample test", () => {
         expect(res.body.count).toEqual(2);
     });
 
+    it("should filter bootcamps with queried averageCost less than 1000", async () => {
+        const res = await request
+            .agent(server)
+            .get("/api/v1/bootcamps?averageCost[lte]=1000");
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.count).toEqual(3);
+    });
+
+    it("should return bootcamps with specific fields", async () => {
+        const res = await request
+            .agent(server)
+            .get("/api/v1/bootcamps?select=name,averageCost");
+        expect(res.statusCode).toEqual(200);
+        expect(
+            Object.keys(res.body.data[0]).includes("description")
+        ).toBeFalsy();
+    });
+
+    it("should return bootcamps sorted ascending in averageCost", async () => {
+        const res = await request
+            .agent(server)
+            .get("/api/v1/bootcamps?sort=averageCost");
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.data[0].averageCost).toBe(500);
+        expect(res.body.data[3].averageCost).toBe(1200);
+    });
+
     afterAll(async () => {
         server.close();
         conn.disconnect();
