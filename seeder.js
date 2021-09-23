@@ -8,12 +8,16 @@ dotenv.config({ path: "./config/config.env" });
 
 // models
 const Bootcamp = require("./models/Bootcamp");
+const Course = require("./models/Course");
 
 // read json data
 const bootcampData = JSON.parse(
     fs.readFileSync(`${__dirname}/data/bootcamps.json`, "utf-8")
 );
-console.log(process.env.GEOCODER_PROVIDER);
+const courseData = JSON.parse(
+    fs.readFileSync(`${__dirname}/data/courses.json`, "utf-8")
+);
+
 // connect to database
 let conn = mongoose.connect(process.env.MONGO_URI, {});
 
@@ -21,6 +25,7 @@ let conn = mongoose.connect(process.env.MONGO_URI, {});
 const addData = async () => {
     try {
         await Bootcamp.create(bootcampData);
+        await Course.create(courseData);
         console.log("Data Imported...".green.inverse);
         process.exit();
     } catch (error) {
@@ -33,6 +38,7 @@ const addData = async () => {
 const removeData = async () => {
     try {
         await Bootcamp.deleteMany();
+        await Course.deleteMany();
         console.log("Data deleted...".green.inverse);
         process.exit();
     } catch (error) {
