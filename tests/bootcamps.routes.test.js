@@ -67,6 +67,17 @@ describe("Sample test", () => {
         expect(res.body.data[3].averageCost).toBe(1200);
     });
 
+    it("should has prev page in pagination", async () => {
+        const res = await request
+            .agent(server)
+            .get("/api/v1/bootcamps?select=name&limit=1&page=4");
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.pagination.prev).toMatchObject({
+            page: 3,
+            limit: 1,
+        });
+    });
+
     afterAll(async () => {
         server.close();
         conn.disconnect();
