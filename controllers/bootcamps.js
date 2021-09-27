@@ -110,10 +110,7 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/bootcamps/:id
 // @access  Private
 exports.udpdateBootcamp = asyncHandler(async (req, res, next) => {
-    const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-    });
+    const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
         return next(
@@ -123,6 +120,11 @@ exports.udpdateBootcamp = asyncHandler(async (req, res, next) => {
             )
         );
     }
+
+    const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+    });
 
     res.status(200).json({ success: true, data: bootcamp });
 });
@@ -142,7 +144,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
         );
     }
 
-    bootcamp.remove();
+    await bootcamp.remove();
 
     res.status(200).json({ success: true, data: {} });
 });
