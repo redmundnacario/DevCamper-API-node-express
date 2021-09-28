@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan"); // third-party logger middleware
 const colors = require("colors");
 const dotenv = require("dotenv");
+const fileUpload = require("express-fileupload");
 
 // Load environment variables
 dotenv.config({ path: "./config/config.env" });
@@ -17,8 +18,8 @@ const courses = require("./routes/courses");
 const app = express();
 
 // Pre-middlewares
-// Json Body parser
-app.use(express.json());
+app.use(express.json()); // Json Body parser
+app.use(fileUpload()); // File or image uploading
 
 // Dev logging middlewares
 // app.use(logger); //--> using custom logger
