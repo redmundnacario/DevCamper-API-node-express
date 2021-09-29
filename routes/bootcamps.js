@@ -6,6 +6,7 @@ const {
     udpdateBootcamp,
     deleteBootcamp,
     getBootCampsWithinRadius,
+    uploadImageBootcamp,
 } = require("../controllers/bootcamps");
 
 // Schema
@@ -28,6 +29,8 @@ router
     .route("/")
     .get(advancedResults(Bootcamp, "courses"), getBootcamps)
     .post(createBootcamp);
+
+router.route("/:id/photo").put(uploadImageBootcamp);
 
 router
     .route("/:id")

@@ -16,7 +16,6 @@ describe("Sample test", () => {
                     process.env.NODE_ENV,
                 ]} mode with port ${PORT}`.yellow.bold
             );
-            // since the application is already listening, it should use the allocated port
         });
     });
 

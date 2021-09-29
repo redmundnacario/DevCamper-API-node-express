@@ -18,9 +18,6 @@ const courseData = JSON.parse(
     fs.readFileSync(`${__dirname}/data/courses.json`, "utf-8")
 );
 
-// connect to database
-let conn = mongoose.connect(process.env.MONGO_URI, {});
-
 // function to add bootcamp data in database
 const addData = async () => {
     try {
@@ -46,6 +43,35 @@ const removeData = async () => {
     }
 };
 
+// connect to db
+let conn;
+if (process.argv[3] === "test") {
+    // connect to database
+    conn = mongoose
+        .connect(process.env.TEST_MONGO_URI, {})
+        .then((res) => {
+            console.log(
+                `MongoDB connected: ${res.connection.host}`.cyan.underline.bold
+            );
+        })
+        .catch(err);
+} else if (process.argv[3] === "dev") {
+    // connect to database
+    conn = mongoose
+        .connect(process.env.MONGO_URI, {})
+        .then((res) => {
+            console.log(
+                `MongoDB connected: ${res.connection.host}`.cyan.underline.bold
+            );
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+} else {
+    console.error("No environment selected");
+}
+
+// execute
 if (process.argv[2] === "-i") {
     addData();
 } else if (process.argv[2] === "-d") {

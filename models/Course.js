@@ -41,7 +41,7 @@ const CourseSchema = new mongoose.Schema({
 CourseSchema.statics.getAverageCost = async function (bootcampId) {
     const obj = await this.aggregate([
         {
-            $match: bootcampId,
+            $match: { bootcamp: bootcampId },
         },
         {
             $group: {

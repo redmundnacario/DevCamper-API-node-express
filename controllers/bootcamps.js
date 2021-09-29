@@ -43,7 +43,7 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/bootcamps/:id
 // @access  Private
 exports.udpdateBootcamp = asyncHandler(async (req, res, next) => {
-    const bootcamp = await Bootcamp.findById(req.params.id);
+    let bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
         return next(
@@ -54,7 +54,7 @@ exports.udpdateBootcamp = asyncHandler(async (req, res, next) => {
         );
     }
 
-    const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+    bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
     });
@@ -131,10 +131,11 @@ exports.uploadImageBootcamp = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(400, "Please upload an image file"));
     }
 
+    // console.log(req.files);
     const file = req.files.file;
 
     // check if image is the format
-    if (!file.mimetype.startswith("image")) {
+    if (!file.mimetype.startsWith("image")) {
         return next(new ErrorResponse(400, "Please upload an image file"));
     }
 
@@ -152,7 +153,7 @@ exports.uploadImageBootcamp = asyncHandler(async (req, res, next) => {
     file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
 
     // upload the image
-    file.mv(`${process.env.FILE_UPLOAD_PATH}`, async (err) => {
+    file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
         if (err) {
             console.log(err);
             return next(

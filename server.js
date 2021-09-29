@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan"); // third-party logger middleware
 const colors = require("colors");
@@ -12,6 +13,7 @@ dotenv.config({ path: "./config/config.env" });
 const errorHandler = require("./middleware/errorHandler");
 
 // Route files
+const auth = require("./routes/auth");
 const bootcamps = require("./routes/bootcamps");
 const courses = require("./routes/courses");
 
@@ -27,7 +29,11 @@ if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
 }
 
+// Set static folder - for file/image uploads dest
+app.use(express.static(path.join(__dirname, "public")));
+
 // routes
+app.use("/api/v1/auth", auth);
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
 
