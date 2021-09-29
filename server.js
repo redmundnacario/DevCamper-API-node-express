@@ -4,6 +4,7 @@ const morgan = require("morgan"); // third-party logger middleware
 const colors = require("colors");
 const dotenv = require("dotenv");
 const fileUpload = require("express-fileupload");
+const cookieParser = require("cookie-parser");
 
 // Load environment variables
 dotenv.config({ path: "./config/config.env" });
@@ -21,6 +22,7 @@ const app = express();
 
 // Pre-middlewares
 app.use(express.json()); // Json Body parser
+app.use(cookieParser()); // for parsing cookie
 app.use(fileUpload()); // File or image uploading
 
 // Dev logging middlewares

@@ -9,6 +9,10 @@ exports.register = asyncHandler(async (req, res, next) => {
     const { name, email, password, role } = req.body;
 
     //check if email is already taken
+    let existingUser = await User.findOne({ email: email });
+    if (existingUser) {
+        return next(new ErrorResponse(400, "User account already exists"));
+    }
     //check if email exists is already handled by Schema if "unique: true"
 
     const user = await User.create({
@@ -18,13 +22,7 @@ exports.register = asyncHandler(async (req, res, next) => {
         role,
     });
 
-    // create token
-    const token = user.getSignedJwToken();
-
-    res.status(201).json({
-        success: true,
-        token,
-    });
+    sendTokenResponse(user, 200, res);
 });
 
 // @desc    Login an existing User
@@ -53,11 +51,24 @@ exports.login = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(401, "Invalid credentials"));
     }
 
-    // create token
+    sendTokenResponse(user, 200, res);
+});
+
+const sendTokenResponse = (user, statusCode, res) => {
     const token = user.getSignedJwToken();
 
-    res.status(200).json({
-        success: true,
-        token,
-    });
-});
+    const options = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    };
+
+    if (process.env.NODE_ENV === "production") {
+        options.secure = true;
+    }
+
+    res.status(statusCode)
+        .cookie("token", token, options)
+        .json({ success: true, token: token });
+};
