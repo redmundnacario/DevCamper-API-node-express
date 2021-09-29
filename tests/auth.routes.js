@@ -7,3 +7,6 @@
 // test unsuccessful login
 
 // ! unique email validation not working!!
+
+// test the auth middleware
+// test jwt generation
