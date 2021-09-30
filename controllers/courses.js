@@ -48,7 +48,10 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 exports.createCourse = asyncHandler(async (req, res, next) => {
     // get bootcamp id from params and assign to req body
     const bootcampId = req.params.bootcampId;
+
+    // assign the foreign ids
     req.body.bootcamp = bootcampId;
+    req.body.user = req.user.id;
 
     // verify if course exist
     const bootcamp = await Bootcamp.findById(bootcampId);
@@ -78,6 +81,16 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
         );
     }
 
+    // Only the owner/publisher and admin should have access
+    if (course.user.toString() !== req.user.id && req.user.role !== "admin") {
+        return next(
+            new ErrorResponse(
+                401,
+                `User with id ${req.user.id} is unauthorized`
+            )
+        );
+    }
+
     course = await Course.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
@@ -97,6 +110,16 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
             new ErrorResponse(
                 404,
                 `Course with Id of ${req.params.id} was not found`
+            )
+        );
+    }
+
+    // Only the owner/publisher and admin should have access
+    if (course.user.toString() !== req.user.id && req.user.role !== "admin") {
+        return next(
+            new ErrorResponse(
+                401,
+                `User with id ${req.user.id} is unauthorized`
             )
         );
     }
