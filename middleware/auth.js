@@ -38,6 +38,8 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
 //prettier-ignore
 exports.authorize = (...roles) => (req, res, next) => {
+    console.log(req.user.role)
+    console.log(roles)
     if (!roles.includes(req.user.role)) {
         return next(new ErrorResponse(403, "User role is unauthorized"));
     }
