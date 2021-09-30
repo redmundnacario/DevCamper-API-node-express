@@ -8,5 +8,7 @@
 
 // ! unique email validation not working!!
 
-// test the auth middleware
+// test the auth middleware "protect"
 // test jwt generation
+
+// test the user role access

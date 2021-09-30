@@ -20,7 +20,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
     // if token not exists
     if (!token) {
-        return next(new ErrorResponse(401, "Unauthorized access 2"));
+        return next(new ErrorResponse(401, "Unauthorized access"));
     }
 
     // verify token
@@ -32,6 +32,14 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
         next();
     } catch (error) {
-        return next(new ErrorResponse(401, "Unauthorized access 3"));
+        return next(new ErrorResponse(401, "Unauthorized access"));
     }
 });
+
+//prettier-ignore
+exports.authorize = (...roles) => (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+        return next(new ErrorResponse(403, "User role is unauthorized"));
+    }
+    next();
+};
