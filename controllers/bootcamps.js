@@ -70,6 +70,16 @@ exports.udpdateBootcamp = asyncHandler(async (req, res, next) => {
         );
     }
 
+    // Only the owner/publisher and admin should have access
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+        return next(
+            new ErrorResponse(
+                401,
+                `User with id ${req.user.id} is unauthorized`
+            )
+        );
+    }
+
     bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
@@ -93,6 +103,16 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
         );
     }
 
+    // Only the owner/publisher and admin should have access
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+        return next(
+            new ErrorResponse(
+                401,
+                `User with id ${req.user.id} is unauthorized`
+            )
+        );
+    }
+
     await bootcamp.remove();
 
     res.status(200).json({ success: true, data: {} });
@@ -100,7 +120,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 
 // @desc    Get bootcamps within a radius
 // @route   GET /api/v1/bootcamps/radius/:zipcode/:distance
-// @access  Private
+// @access  Public
 exports.getBootCampsWithinRadius = asyncHandler(async (req, res, next) => {
     const { zipcode, distance } = req.params;
 
