@@ -62,6 +62,27 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     res.status(200).json({ success: true, data: user });
 });
 
+// @desc    Create hashed token for forgot password scenario
+// @route   POST /api/v1/auth/forgot-pasword
+// @access  Public
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+    // determine if input email is an existing user
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        return next(new ErrorResponse(404, "There is no user with that email"));
+    }
+
+    // methods
+    user.getResetPasswordToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+        success: true,
+        data: user,
+    });
+});
+
 const sendTokenResponse = (user, statusCode, res) => {
     const token = user.getSignedJwToken();
 
