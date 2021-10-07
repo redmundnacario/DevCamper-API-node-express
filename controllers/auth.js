@@ -2,6 +2,7 @@ const ErrorResponse = require("../utils/errorResponse");
 const sendEmail = require("../utils/emailer");
 const User = require("../models/User");
 const asyncHandler = require("../middleware/asyncHandler");
+const crypto = require("crypto");
 
 // @desc    Register new User
 // @route   POST /api/v1/auth/register
@@ -68,14 +69,13 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
     // determine if input email is an existing user
-    const user = await User.findOne({ email: req.body.email });
+    let user = await User.findOne({ email: req.body.email });
     if (!user) {
         return next(new ErrorResponse(404, "There is no user with that email"));
     }
 
     // methods for reset token
-    const resetToken = await user.getResetPasswordToken();
-
+    const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
     //  create reset protocol
@@ -104,12 +104,38 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
         return next(new ErrorResponse(500, "Email not sent"));
     }
-
-    // res.status(200).json({
-    //     success: true,
-    //     data: user,
-    // });
 });
+
+// @desc    Reset password
+// @route   PUT /api/v1/auth/resetpassword/:resettoken
+// @access  Public
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+    // Get hashed token
+    const resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(req.params.resettoken)
+        .digest("hex");
+
+    // find user through resettoken
+    let user = await User.findOne({
+        resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() },
+    });
+    console.log(resetPasswordToken);
+    if (!user) {
+        return next(new ErrorResponse(400, "Invalid token"));
+    }
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    sendTokenResponse(user, 200, res);
+});
+
+// Helper function
 
 const sendTokenResponse = (user, statusCode, res) => {
     const token = user.getSignedJwToken();

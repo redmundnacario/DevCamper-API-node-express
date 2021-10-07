@@ -49,7 +49,7 @@ const UserSchema = new mongoose.Schema({
 // });
 
 // Encrypting password
-UserSchema.pre("save", async function (req, res, next) {
+UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         next();
     }
@@ -71,7 +71,7 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 // Method: Generate Reset password token
-UserSchema.methods.getResetPasswordToken = async function (res, req, next) {
+UserSchema.methods.getResetPasswordToken = function (res, req, next) {
     // generate a token
     const resetToken = crypto.randomBytes(20).toString("hex");
 
