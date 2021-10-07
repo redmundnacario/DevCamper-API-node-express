@@ -1,4 +1,5 @@
 const ErrorResponse = require("../utils/errorResponse");
+const sendEmail = require("../utils/emailer");
 const User = require("../models/User");
 const asyncHandler = require("../middleware/asyncHandler");
 
@@ -63,7 +64,7 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Create hashed token for forgot password scenario
-// @route   POST /api/v1/auth/forgot-pasword
+// @route   POST /api/v1/auth/forgotpasword
 // @access  Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
     // determine if input email is an existing user
@@ -72,15 +73,42 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(404, "There is no user with that email"));
     }
 
-    // methods
-    user.getResetPasswordToken();
+    // methods for reset token
+    const resetToken = await user.getResetPasswordToken();
 
     await user.save({ validateBeforeSave: false });
 
-    res.status(200).json({
-        success: true,
-        data: user,
-    });
+    //  create reset protocol
+    const resetUrl = `${req.protocol}://${req.get(
+        "host"
+    )}/api/v1/auth/resetpassword/${resetToken}`;
+    // message
+    const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+
+    // send email
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: "Password Reset Token",
+            message,
+        });
+        res.status(200).json({ success: true, data: "Email sent" });
+    } catch (error) {
+        console.log(error);
+
+        // reset the two new variables awhile ago to undefined
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save({ validateBeforeSave: false });
+
+        return next(new ErrorResponse(500, "Email not sent"));
+    }
+
+    // res.status(200).json({
+    //     success: true,
+    //     data: user,
+    // });
 });
 
 const sendTokenResponse = (user, statusCode, res) => {
