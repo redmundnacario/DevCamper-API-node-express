@@ -64,6 +64,51 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     res.status(200).json({ success: true, data: user });
 });
 
+// Update User details
+
+// @desc    Edit user details
+// @route   PUT /api/v1/auth/updatedetails
+// @access  Private
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+    // limit fields to update
+    const fieldsToUpdate = {
+        name: req.body.name,
+        email: req.body.email,
+    };
+
+    const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+        new: true,
+        runValidators: true,
+    });
+
+    res.status(200).json({ success: true, data: user });
+});
+
+// Update Password
+
+// Update User details
+
+// @desc    Change user password
+// @route   PUT /api/v1/auth/updatepassword
+// @access  Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select("+password");
+
+    // check password if correct
+    const isMatch = await user.matchPassword(req.body.currentPassword);
+
+    if (!isMatch) {
+        return next(new ErrorResponse(401, "Invalid password"));
+    }
+
+    user.password = req.body.newPassword;
+    await user.save();
+
+    sendTokenResponse(user, 200, res);
+});
+
+// Forgot Password
+
 // @desc    Create hashed token for forgot password scenario
 // @route   POST /api/v1/auth/forgotpasword
 // @access  Public
