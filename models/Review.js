@@ -59,10 +59,11 @@ ReviewSchema.post("save", async function () {
     this.constructor.getAverageRating(this.bootcamp);
 });
 
-ReviewSchema.post("updateOne", async function (next) {
-    console.log("Review updated");
-    console.log(this);
-});
+// Update doest not recalculate ratings
+// ReviewSchema.post("updateOne", async function (next) {
+//     console.log("Review updated");
+//     console.log(this);
+// });
 
 // Call a method getAverageRating before remove
 ReviewSchema.pre("remove", async function () {
