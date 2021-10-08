@@ -5,6 +5,9 @@ const colors = require("colors");
 const dotenv = require("dotenv");
 const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
 
 // Load environment variables
 dotenv.config({ path: "./config/config.env" });
@@ -27,6 +30,9 @@ const app = express();
 app.use(express.json()); // Json Body parser
 app.use(cookieParser()); // for parsing cookie
 app.use(fileUpload()); // File or image uploading
+app.use(mongoSanitize()); // Sanitize data/inputs in routes
+app.use(helmet()); // set security headers
+app.use(xss()); // disables xss
 
 // Dev logging middlewares
 // app.use(logger); //--> using custom logger
