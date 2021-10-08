@@ -8,6 +8,9 @@ const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
 const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
 
 // Load environment variables
 dotenv.config({ path: "./config/config.env" });
@@ -30,9 +33,19 @@ const app = express();
 app.use(express.json()); // Json Body parser
 app.use(cookieParser()); // for parsing cookie
 app.use(fileUpload()); // File or image uploading
+
+// Security middlewares
 app.use(mongoSanitize()); // Sanitize data/inputs in routes
 app.use(helmet()); // set security headers
 app.use(xss()); // disables xss
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 mins
+    max: 100,
+});
+app.use(limiter);
+app.use(hpp()); // Prevent http param pollution
+app.use(cors()); // enable CORS
 
 // Dev logging middlewares
 // app.use(logger); //--> using custom logger
