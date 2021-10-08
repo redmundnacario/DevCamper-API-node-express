@@ -17,10 +17,12 @@ const advancedResults = require("../middleware/advancedResults");
 const { protect, authorize } = require("../middleware/auth");
 // inlude other resoucce router
 const courseRouter = require("./courses");
+const reviewRouter = require("./reviews");
 
 const router = express.Router();
 
 // pass it to ./course routers
+router.use("/:bootcampId/reviews", reviewRouter);
 router.use("/:bootcampId/courses", courseRouter);
 
 router.route("/radius/:zipcode/:distance").get(getBootCampsWithinRadius);
