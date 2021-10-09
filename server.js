@@ -63,10 +63,10 @@ app.use("/api/v1/courses", courses);
 app.use("/api/v1/users", users);
 app.use("/api/v1/reviews", reviews);
 
-// fall back error if no routes detected
-// app.use((req, res, next) => {
-//     return next(new ErrorResponse(404, "404 Not found!"));
-// });
+//fall back error if no routes detected
+app.use((req, res, next) => {
+    return next(new ErrorResponse(404, "404 Not found!"));
+});
 
 // Post-middlewares
 app.use(errorHandler);
